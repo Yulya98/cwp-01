@@ -13,24 +13,46 @@ for(var i = 0; i<process.argv.length; i++) {
 
 
 //region Task_3
-var fs = require('fs');
-var path = require('path');
 
-var getFiles = function (dir, files_){
+let fs = require('fs');
 
-    files_ = files_ || [];
-    var files = fs.readdirSync(dir);
-    for (var i in files){
-        var name = dir + '/' + files[i];
-        if (fs.statSync(name).isDirectory()){
-            getFiles(name, files_);
-        } else {
-            files_.push(name.replace(/\.\/folder\//g,''));
+let createScript = function( path, callback){
+    if( typeof callback !== 'function' )
+        return ;
+    let result = [], files = [ path.replace( /\/\s*$/, '' ) ];
+    function traverseFiles (){
+        if( files.length ) {
+            let name = files.shift();
+            fs.stat(name, function( err, stats){
+                if( err ){
+
+                    if( err.errno == 34 )
+                        traverseFiles();
+                    else callback(err)
+                }
+                else if ( stats.isDirectory())
+                    fs.readdir( name, function( err, files2 ){
+                    if( err )
+                        callback(err)
+                    else {
+                        files = files2
+                            .map( function( file ){ return name + '/' + file } )
+                            .concat( files )
+                        traverseFiles()
+                    }
+                });
+                else{
+                    result.push(name);
+                    traverseFiles()
+                }
+            })
         }
+        else callback( null, result )
     }
-    return files_;
+    traverseFiles()
 };
 
-
-console.log(getFiles('./folder'));
+createScript('./folder',function(filePath, stat) {
+    console.log(stat);
+});
 //endregion
