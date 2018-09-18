@@ -42,14 +42,14 @@ createScript('./folder',function(filePath, stat) {
     }
 });
 
-const path = require('path');
+const paths = require('path');
 
 let createDirectory = function(){
     fs.mkdir('folder/folder',(err, succ) => {});
     createScript('./folder',function(filePath, stat) {
         for(let i=0;i<stat.length;i++){
             fs.readFile(stat[i],"utf-8", (err, res) => {
-                let nameFile = path.basename(stat[i]);
+                let nameFile = paths.basename(stat[i]);
                 if (err)
                     throw err;
                 fs.open('folder/folder/'+nameFile, 'w',(err, fd) => {});
