@@ -1,4 +1,4 @@
-let fs = require('fs'); 
+let fs = require('fs');
  let createScript = function( path, callback){
     // the callback gets ( err, files) where files is an array of file names
     if( typeof callback !== 'function' )
@@ -46,18 +46,19 @@ let createDirectory = function(){
     fs.mkdir('folder/folder',(err, succ) => {});
     createScript('./folder',function(filePath, stat) {
         for(let i=0;i<stat.length;i++){
-            console.log(stat[i]);
-            fs.readFile(stat[i],"utf-8", (err, data) => {
-                console.log(data);
+            fs.readFile(stat[i],"utf-8", (err, res) => {
                 let nameFile = path.basename(stat[i]);
-                console.log(nameFile);
                 if (err)
                     throw err;
                 fs.open('folder/folder/'+nameFile, 'w',(err, fd) => {});
-                fs.writeFile('./folder/folder/'+nameFile, data,(err) => {
-                    if (err)
+                fs.readFile('./folder/config.json', 'utf-8', function (err, data) {
+                    if(err)
                         throw err;
-                    console.log('The file has been saved!');
+                    let obj = JSON.parse(data);
+                    fs.writeFile('./folder/folder/'+nameFile,obj.copyright + res + obj.copyright,(err) => {
+                        if (err)
+                            throw err;
+                    });
                 });
             });
         }
