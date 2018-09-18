@@ -1,6 +1,5 @@
 let fs = require('fs');
  let createScript = function( path, callback){
-    // the callback gets ( err, files) where files is an array of file names
     if( typeof callback !== 'function' )
         return ;
     let result = [], files = [ path.replace( /\/\s*$/, '' ) ];
@@ -41,6 +40,7 @@ createScript('./folder',function(filePath, stat) {
 });
 
 const path = require('path');
+let watching = false;
 
 let createDirectory = function(){
     fs.mkdir('folder/folder',(err, succ) => {});
@@ -66,3 +66,13 @@ let createDirectory = function(){
 };
 
 createDirectory();
+
+let watchFiles = function () {
+    fs.watch('./folder/folder', { encoding: 'utf-8' }, (eventType, filename) => {
+        if (watching === true) {
+            console.log(filename);
+        }
+    });
+};
+
+watchFiles();
